@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "containerd-grpc/pb";
+
+service ImageService {
+	rpc listImages(ListImagesRequest) returns (ListImagesResponse) {}
+	rpc pullImage(PullImageRequest) returns (PullImageResponse) {}
+	rpc deleteImage(DeleteImageRequest) returns (google.protobuf.Empty) {}
+}
+
+service ContainerService {
+	rpc listContainers(ListContainersRequest) returns (ListContainersResponse) {}
+	rpc createContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+	rpc deleteContainer(DeleteContainerRequest) returns (google.protobuf.Empty) {}
+}
+
+service NamespaceService {
+	rpc listNamespaces(google.protobuf.Empty) returns (ListNamespacesResponse) {}
+}
+
+service TaskService {
+	rpc listTasks(ListTasksRequest) returns (ListTasksResponse) {}
+	rpc tailLog(TailLogRequest) returns (stream TailLogResponse) {}
+	rpc createTask(CreateTaskRequest) returns (CreateTaskResponse) {}
+	rpc deleteTask(DeleteTaskRequest) returns (google.protobuf.Empty) {}
+}
+
+message Image {
+	string name = 1;
+	map<string, string> labels = 2;
+	int64 size = 3;
+}
+
+message PullImageRequest {
+	string namespace = 1;
+	string name = 2;
+}
+
+message ListImagesRequest {
+	string namespace = 1;
+}
+
+message ListImagesResponse {
+	repeated Image images = 1;
+	int64 count = 2;
+}
+
+message PullImageResponse {
+	Image image = 1;
+}
+
+message DeleteImageRequest {
+	string namespace = 1;
+	string image_name = 2;
+}
+
+
+message Container {
+	string id = 1;
+	Image image = 2;
+	map<string, string> labels = 3;
+}
+
+message ListContainersRequest {
+	string namespace = 1;
+}
+
+message ListContainersResponse {
+	repeated Container containers = 1;
+	int64 count = 2;
+}
+
+message CreateContainerRequest {
+	string namespace = 1;
+	string name = 2;
+	string image_name = 3;
+}
+
+message CreateContainerResponse {
+	Container container = 1;
+}
+
+message DeleteContainerRequest {
+	string namespace = 1;
+	string container_id = 2;
+}
+
+message ListNamespacesResponse {
+	repeated string namespaces = 1;
+	int64 count = 2;
+}
+
+message Process {
+	string id = 1;
+	repeated uint32 pids = 2;
+	
+}
+
+message Task {
+	repeated uint32 pids = 1;
+	Process process = 2;
+}
+
+message ListTasksRequest {
+	string namespace = 1;
+}
+
+message ListTasksResponse {
+	repeated Task tasks = 1;
+	int64 count = 2;
+}
+
+message TailLogRequest {
+	string namespace = 1;
+	string container_id = 2;
+}
+
+message TailLogResponse {
+	string logs = 1;
+}
+
+message CreateTaskRequest {
+	string namespace = 1;
+	string container_id = 2;
+}
+
+message CreateTaskResponse {
+	Task task = 1;
+}
+
+message DeleteTaskRequest {
+	string task_id = 1;
+}
