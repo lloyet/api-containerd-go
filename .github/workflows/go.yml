@@ -1,0 +1,33 @@
+name: Test and build Go app
+
+on:
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Test and build go application"
+
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        node-version: [">=1.21.3"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.node-version }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.node-version }}
+
+      - name: Installing Modules
+        run: go get
+
+      - name: Building Binary
+        run: go build -o build/ctrgrpc
